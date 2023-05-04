@@ -2,11 +2,19 @@ const express = require('express');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
-const io = require('socket.io')(8080, {
+const port = process.env.PORT || 8000;
+const app = express();
+const http = require('http').Server(app);
+const io = require('socket.io')(http, {
     cors: {
-        origin: 'http://localhost:3000',
+        origin: '*',
     }
 });
+// const io = require('socket.io')(8800, {
+//     cors: {
+//         origin: '*',
+//     }
+// });
 
 // Connect DB
 require('./db/connection');
@@ -17,12 +25,10 @@ const Conversations = require('./models/Conversations');
 const Messages = require('./models/Messages');
 
 // app Use
-const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
-const port = process.env.PORT || 8000;
 
 // Socket.io
 let users = [];
@@ -237,6 +243,6 @@ app.get('/api/users/:userId', async (req, res) => {
     }
 })
 
-app.listen(port, () => {
-    console.log('listening on port ' + port);
-})
+http.listen(port, () => {
+        console.log('listening on port ' + port);
+});
